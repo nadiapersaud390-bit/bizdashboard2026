@@ -1586,15 +1586,8 @@ function toggleRevenueDropdown() {
 async function updateDashboard() {
     const btn=document.getElementById('refresh-btn');btn.classList.add('spin-anim');
     try {
-        const res=await fetch(API_URL+'?t='+Date.now(), {method:'GET', redirect:'follow'});
-        const text=await res.text();
-        let parsed;
-        try { parsed=JSON.parse(text); } catch(e){ throw new Error('JSON parse fail: '+text.slice(0,100)); }
-        if(parsed && parsed.error) throw new Error('Script error: '+parsed.error);
-        if(!Array.isArray(parsed)) throw new Error('Expected array, got: '+JSON.stringify(parsed).slice(0,80));
-        agents=parsed;
+        const res=await fetch(API_URL);agents=await res.json();
         agents.forEach(a=>{if(!a.team)a.team=getTeam(a.name);});
-        // Always override todayName with client-side Guyana day
         if(agents.length>0) agents[0].todayName=getGuyanaToday();
         if(agents.length>0){if(agents[0].dayHistory)dayHistory=agents[0].dayHistory;dayHistory.forEach(d=>{d.agents.forEach(a=>{if(!a.team)a.team=getTeam(a.name);});});}
         if(agents.length>0&&!agents[0].prTotal&&!agents[0].bbTotal){let pr=0,bb=0;agents.forEach(a=>{if(a.team==='PR')pr+=(a.dailyLeads||0);else bb+=(a.dailyLeads||0);});agents[0].prTotal=pr;agents[0].bbTotal=bb;}
@@ -1602,9 +1595,10 @@ async function updateDashboard() {
         checkLeadAlerts(agents);
         render();renderDaySubTabs();
         document.getElementById('timestamp').innerText='Live: '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    } catch(e){document.getElementById('timestamp').innerText='Error: '+e.message.slice(0,40);console.error('Dashboard error:',e);}
+    } catch(e){document.getElementById('timestamp').innerText='System Offline';}
     finally{setTimeout(()=>btn.classList.remove('spin-anim'),1000);}
 }
+
 
 function renderDaySubTabs() {
     const wrapper=document.getElementById('day-sub-tabs-wrapper'),container=document.getElementById('day-sub-tabs-container');
