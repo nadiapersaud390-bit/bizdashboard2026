@@ -198,14 +198,14 @@
   // 3. In the left panel → Build → Realtime Database → Create database (start in test mode)
   // Replace the placeholder config below with YOUR Firebase config:
   const firebaseConfig = {
-    apiKey: "AIzaSyAXagI_dHF2cP7F64jC2EdyxytjepcgXxA",
-    authDomain: "pr-dashboard-d4b14.firebaseapp.com",
-    databaseURL: "https://pr-dashboard-d4b14-default-rtdb.firebaseio.com",
-    projectId: "pr-dashboard-d4b14",
-    storageBucket: "pr-dashboard-d4b14.firebasestorage.app",
-    messagingSenderId: "996098057132",
-    appId: "1:996098057132:web:5a643b7f0daf36eea25009",
-    measurementId: "G-9FR7ZR845Q"
+    apiKey: "AIzaSyA5u7B8UJQOFG8yhE0YKWCiWCHQgaNu1mY",
+    authDomain: "biz-dashboard-4396c.firebaseapp.com",
+    databaseURL: "https://biz-dashboard-4396c-default-rtdb.firebaseio.com",
+    projectId: "biz-dashboard-4396c",
+    storageBucket: "biz-dashboard-4396c.firebasestorage.app",
+    messagingSenderId: "394155720592",
+    appId: "1:394155720592:web:b85a142cf8c885726b3d15",
+    measurementId: "G-VMMZWCMLBR"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -1537,7 +1537,7 @@
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbz19WrpBmC6GrWG2yK2ERtt2VfaCduS5QUmQtb5QllY4O3S_O0c5-bbrR7hqB0pvsrd/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyJLJciIoktwMHQpYTt7r6hO_en9v1sHSun-Q6im1XYKZNIsI5ioucrEYqROXwxWcvd/exec';
 const WEEKLY_PASSWORD = 'bizlevelup2025';
 const DAY_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAY_FULL  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -2303,12 +2303,12 @@ function getFirstName(fullName) {
 function checkLeadAlerts(newAgents) {
   if (!newAgents || !newAgents.length) return;
 
-  // Use berbiceTracker if available, else fall back to BB dailyLeads
-  const tracker = (newAgents[0] && newAgents[0].berbiceTracker) || {};
+  // Use providenceTracker if available, else fall back to PR dailyLeads
+  const tracker = (newAgents[0] && newAgents[0].providenceTracker) || {};
   let snapshot = Object.keys(tracker).length ? tracker : {};
   if (!Object.keys(snapshot).length) {
     newAgents.forEach(a => {
-      if ((a.team || getTeam(a.name)) === 'BB') snapshot[a.name] = a.dailyLeads || 0;
+      if ((a.team || getTeam(a.name)) === 'PR') snapshot[a.name] = a.dailyLeads || 0;
     });
   }
   if (!Object.keys(snapshot).length) return;
