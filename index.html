@@ -2580,12 +2580,12 @@ function getFirstName(fullName) {
 function checkLeadAlerts(newAgents) {
   if (!newAgents || !newAgents.length) return;
 
-  // Use berbiceTracker if available, else fall back to BB dailyLeads
-  const tracker = (newAgents[0] && newAgents[0].berbiceTracker) || {};
+  // Use providenceTracker for PR reps only
+  const tracker = (newAgents[0] && newAgents[0].providenceTracker) || {};
   let snapshot = Object.keys(tracker).length ? tracker : {};
   if (!Object.keys(snapshot).length) {
     newAgents.forEach(a => {
-      if ((a.team || getTeam(a.name)) === 'BB') snapshot[a.name] = a.dailyLeads || 0;
+      if ((a.team || getTeam(a.name)) === 'PR') snapshot[a.name] = a.dailyLeads || 0;
     });
   }
   if (!Object.keys(snapshot).length) return;
