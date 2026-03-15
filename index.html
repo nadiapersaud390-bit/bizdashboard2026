@@ -1586,12 +1586,16 @@ function toggleRevenueDropdown() {
 async function updateDashboard() {
     const btn=document.getElementById('refresh-btn');btn.classList.add('spin-anim');
     try {
+        console.log('[DASH] Fetching from:', API_URL);
         const res=await fetch(API_URL+'?t='+Date.now(), {method:'GET', redirect:'follow'});
+        console.log('[DASH] Response status:', res.status, res.ok);
         const text=await res.text();
+        console.log('[DASH] Raw response:', text.slice(0,200));
         let parsed;
         try { parsed=JSON.parse(text); } catch(e){ throw new Error('JSON parse fail: '+text.slice(0,100)); }
         if(parsed && parsed.error) throw new Error('Script error: '+parsed.error);
         if(!Array.isArray(parsed)) throw new Error('Expected array, got: '+JSON.stringify(parsed).slice(0,80));
+        console.log('[DASH] Agents loaded:', parsed.length);
         agents=parsed;
         agents.forEach(a=>{if(!a.team)a.team=getTeam(a.name);});
         // Always override todayName with client-side Guyana day
@@ -2591,12 +2595,17 @@ function checkLeadAlerts(newAgents) {
       if ((a.team || getTeam(a.name)) === 'PR') snapshot[a.name] = Number(a.dailyLeads) || 0;
     });
   }
-  if (!Object.keys(snapshot).length) return;
+  if (!Object.keys(snapshot).length) { console.log('[ALERT] No PR snapshot found'); return; }
+
+  console.log('[ALERT] snapshot:', JSON.stringify(snapshot));
+  console.log('[ALERT] prevLeadCounts:', JSON.stringify(prevLeadCounts));
+  console.log('[ALERT] initialized:', leadAlertInitialized);
 
   // First load — store silently, no alerts
   if (!leadAlertInitialized) {
     Object.entries(snapshot).forEach(([n, c]) => { prevLeadCounts[n] = c; });
     leadAlertInitialized = true;
+    console.log('[ALERT] First load stored silently');
     return;
   }
 
