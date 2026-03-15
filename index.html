@@ -216,9 +216,11 @@
   onValue(broadcastRef, (snapshot) => {
     const data = snapshot.val();
     if (data && data.message && data.active) {
-      showBroadcastBar(data.message);
+      if(typeof showBroadcastBar === 'function') showBroadcastBar(data.message);
+      else window._pendingBroadcast = data.message;
     } else {
-      hideBroadcastBar();
+      if(typeof hideBroadcastBar === 'function') hideBroadcastBar();
+      else window._pendingBroadcast = null;
     }
   });
 
@@ -226,7 +228,7 @@
   onValue(triviaRef, (snapshot) => {
     const data = snapshot.val();
     window._triviaFirebaseScores = data || {};
-    renderTriviaLeaderboard();
+    if(typeof renderTriviaLeaderboard === 'function') renderTriviaLeaderboard();
   });
 
   // Expose send/clear functions to global scope
@@ -1627,7 +1629,13 @@ function toggleRevenueDropdown() {
 async function updateDashboard() {
     const btn=document.getElementById('refresh-btn');btn.classList.add('spin-anim');
     try {
-        const res=await fetch(API_URL);agents=await res.json();
+        const res=await fetch(API_URL+'?t='+Date.now(), {method:'GET', redirect:'follow'});
+        const text=await res.text();
+        let parsed;
+        try { parsed=JSON.parse(text); } catch(e){ throw new Error('JSON parse fail: '+text.slice(0,100)); }
+        if(parsed && parsed.error) throw new Error('Script error: '+parsed.error);
+        if(!Array.isArray(parsed)) throw new Error('Expected array, got: '+JSON.stringify(parsed).slice(0,80));
+        agents=parsed;
         agents.forEach(a=>{if(!a.team)a.team=getTeam(a.name);});
         // Always override todayName with client-side Guyana day
         if(agents.length>0) agents[0].todayName=getGuyanaToday();
@@ -1637,7 +1645,7 @@ async function updateDashboard() {
         checkLeadAlerts(agents);
         render();renderDaySubTabs();
         document.getElementById('timestamp').innerText='Live: '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    } catch(e){document.getElementById('timestamp').innerText='System Offline';}
+    } catch(e){document.getElementById('timestamp').innerText='Error: '+e.message.slice(0,40);console.error('Dashboard error:',e);}
     finally{setTimeout(()=>btn.classList.remove('spin-anim'),1000);}
 }
 
@@ -1778,16 +1786,37 @@ function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'
 // CLOCK UPDATE
 // ============================================================
 function updateClocks(){
-  const now=new Date();
-  const guyanaTime=new Date(now.toLocaleString('en-US',{timeZone:'America/Guyana'}));
-  const californiaTime=new Date(now.toLocaleString('en-US',{timeZone:'America/Los_Angeles'}));
-  const fmt=d=>{let h=d.getHours(),m=d.getMinutes(),s=d.getSeconds(),ampm=h>=12?'PM':'AM';h=h%12||12;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+' '+ampm;};
-  const gEl=document.getElementById('clock-guyana'),cEl=document.getElementById('clock-california');
-  if(gEl)gEl.textContent=fmt(guyanaTime);
-  if(cEl)cEl.textContent=fmt(californiaTime);
+  try {
+    const now = new Date();
+    const fmt = (tz) => {
+      return now.toLocaleTimeString('en-US', {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+    };
+    const gEl = document.getElementById('clock-guyana');
+    const cEl = document.getElementById('clock-california');
+    if(gEl) gEl.textContent = fmt('America/Guyana');
+    if(cEl) cEl.textContent = fmt('America/Los_Angeles');
+  } catch(e) {
+    const gEl = document.getElementById('clock-guyana');
+    const cEl = document.getElementById('clock-california');
+    const now = new Date();
+    const t = now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+    if(gEl) gEl.textContent = t;
+    if(cEl) cEl.textContent = t;
+  }
 }
-updateClocks();
-setInterval(updateClocks,1000);
+// Run immediately and every second
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){ updateClocks(); setInterval(updateClocks,1000); });
+} else {
+  updateClocks();
+  setInterval(updateClocks,1000);
+}
 
 // ============================================================
 // TRIVIA QUESTION BANK
