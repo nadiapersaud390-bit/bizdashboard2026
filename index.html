@@ -1480,7 +1480,7 @@
 </div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbz19WrpBmC6GrWG2yK2ERtt2VfaCduS5QUmQtb5QllY4O3S_O0c5-bbrR7hqB0pvsrd/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzc-ia9g7kluzpIX28RBlI6sbblBlKzfeHQRLilc9zBeYzOjYoJKvutxZ76rCYSTWA/exec';
 const WEEKLY_PASSWORD = 'bizlevelup2025';
 const DAY_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAY_FULL  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -2582,8 +2582,7 @@ function checkLeadAlerts(newAgents) {
       if ((a.team || getTeam(a.name)) === 'PR') snapshot[a.name] = a.dailyLeads || 0;
     });
   }
-  if (!Object.keys(snapshot).length) { console.warn('[ALERT] snapshot empty - no PR tracker data'); return; }
-  console.log('[ALERT] tracker keys:', Object.keys(snapshot).length, '| sample:', JSON.stringify(Object.entries(snapshot).slice(0,3)));
+  if (!Object.keys(snapshot).length) return;
 
   // First load — store silently, no alerts
   if (!leadAlertInitialized) {
