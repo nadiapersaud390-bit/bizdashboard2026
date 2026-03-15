@@ -2617,7 +2617,8 @@ function checkLeadAlerts(newAgents) {
     if (c > prev) newReps.push({ name, count: c, isFirst: prev === 0 });
     prevLeadCounts[name] = c;
   });
-  if (!newReps.length) return;
+  console.log('[ALERT] newReps detected:', JSON.stringify(newReps));
+  if (!newReps.length) { console.log('[ALERT] No new reps, skipping'); return; }
 
   // Always show immediately — replaces any existing banner
   if (newReps.length === 1) {
@@ -2658,16 +2659,25 @@ function checkLeadAlerts(newAgents) {
 }
 
 function _renderAlert({icon, name, msg, quote, firstLead=false}) {
+  console.log('[BANNER] _renderAlert called for:', name);
   const banner = document.getElementById('lead-alert-banner');
+  if (!banner) { console.log('[BANNER] ERROR: banner element not found!'); return; }
   const inner = banner.querySelector('.lab-inner');
+  if (!inner) { console.log('[BANNER] ERROR: lab-inner not found!'); return; }
   // Swap gold style for first lead, purple for regular
   if (firstLead) { inner.classList.add('first-lead'); } else { inner.classList.remove('first-lead'); }
   // Update content first, then show
-  document.querySelector('.lab-icon').textContent = icon;
-  document.getElementById('lab-text').innerHTML =
-    escapeHtml(name) + '<span>' + escapeHtml(msg) + ' — ❭' + escapeHtml(quote) + '❮</span>';
+  const iconEl = document.querySelector('.lab-icon');
+  const textEl = document.getElementById('lab-text');
+  if (iconEl) iconEl.textContent = icon;
+  if (textEl) textEl.innerHTML = escapeHtml(name) + '<span>' + escapeHtml(msg) + ' — ❭' + escapeHtml(quote) + '❮</span>';
   banner.classList.add('show');
+  // Force visibility
+  banner.style.transform = 'translateY(0)';
+  banner.style.zIndex = '999999';
   document.body.style.paddingTop = '72px';
+  console.log('[BANNER] banner.classList:', banner.classList.toString());
+  console.log('[BANNER] banner transform:', banner.style.transform);
   startTabBlink(icon + ' ' + name + (firstLead ? ' — First Lead Today!' : ' — New Lead!'));
 }
 
