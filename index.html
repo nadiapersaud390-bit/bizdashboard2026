@@ -2582,7 +2582,8 @@ function checkLeadAlerts(newAgents) {
       if ((a.team || getTeam(a.name)) === 'PR') snapshot[a.name] = a.dailyLeads || 0;
     });
   }
-  if (!Object.keys(snapshot).length) return;
+  if (!Object.keys(snapshot).length) { console.warn('[ALERT] snapshot empty - no PR tracker data'); return; }
+  console.log('[ALERT] tracker keys:', Object.keys(snapshot).length, '| sample:', JSON.stringify(Object.entries(snapshot).slice(0,3)));
 
   // First load — store silently, no alerts
   if (!leadAlertInitialized) {
