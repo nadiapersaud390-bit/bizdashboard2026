@@ -2581,11 +2581,14 @@ function checkLeadAlerts(newAgents) {
   if (!newAgents || !newAgents.length) return;
 
   // Use providenceTracker for PR reps only
-  const tracker = (newAgents[0] && newAgents[0].providenceTracker) || {};
+  const rawTracker = (newAgents[0] && newAgents[0].providenceTracker) || {};
+  // Ensure all values are numbers
+  const tracker = {};
+  Object.entries(rawTracker).forEach(([k,v]) => { tracker[k] = Number(v) || 0; });
   let snapshot = Object.keys(tracker).length ? tracker : {};
   if (!Object.keys(snapshot).length) {
     newAgents.forEach(a => {
-      if ((a.team || getTeam(a.name)) === 'PR') snapshot[a.name] = a.dailyLeads || 0;
+      if ((a.team || getTeam(a.name)) === 'PR') snapshot[a.name] = Number(a.dailyLeads) || 0;
     });
   }
   if (!Object.keys(snapshot).length) return;
@@ -2600,9 +2603,10 @@ function checkLeadAlerts(newAgents) {
   // Find reps with new leads — track if it's their first of the day
   const newReps = [];
   Object.entries(snapshot).forEach(([name, count]) => {
-    const prev = prevLeadCounts[name] ?? 0;
-    if (count > prev) newReps.push({ name, count, isFirst: prev === 0 });
-    prevLeadCounts[name] = count;
+    const c = Number(count) || 0;
+    const prev = Number(prevLeadCounts[name]) || 0;
+    if (c > prev) newReps.push({ name, count: c, isFirst: prev === 0 });
+    prevLeadCounts[name] = c;
   });
   if (!newReps.length) return;
 
