@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIZ Level Up Dashboard | Live Performance</title>
+
+  <!-- ═══ EXTERNAL CDN (never change) ═══ -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+  <!-- ═══ FIREBASE SDK (loaded once here, used by all JS files) ═══ -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CSS FILES — each file owns one section of the site.
+       To edit styles for a section, open that CSS file only.
+  ═══════════════════════════════════════════════════════════ -->
+
+  <!-- 1. Shared styles: body, fonts, glass, tiers, tabs, lookup,
+          playbook, rebuttals, modal base, media queries -->
+  <link rel="stylesheet" href="css/globals.css" />
+
+  <!-- 2. Login screen only: card, rings, waveform, inputs, buttons,
+          success overlay, ticker -->
+  <link rel="stylesheet" href="css/login.css" />
+
+  <!-- 3. Trivia view only: neon vars, question bubble, option buttons,
+          countdown ring, T/F, streaks, confetti -->
+  <link rel="stylesheet" href="css/trivia.css" />
+
+  <!-- 4. Popups & banners: top performer modal, agent info banner,
+          lead alert banner -->
+  <link rel="stylesheet" href="css/modals.css" />
+
+  <!-- 5. Broadcast: alert bar, admin float panel, bc-login-modal -->
+  <link rel="stylesheet" href="css/broadcast.css" />
+
+  <!-- 6. Who's Online view: Nadia admin panel, user cards, stat pills -->
+  <link rel="stylesheet" href="css/online.css" />
+</head>
+
+<body class="p-4 pb-20">
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYOUT NOTE:
+     Each section below is a placeholder <div>.
+     loader.js fetches the matching html/ partial and injects it here.
+     To edit a section's HTML → open its html/ file.
+     To edit a section's JS   → open its js/ file.
+     To edit a section's CSS  → open its css/ file.
+     index.html itself rarely needs to change.
+═══════════════════════════════════════════════════════════ -->
+
+<!-- ── FIXED/FLOATING LAYERS (rendered above everything) ── -->
+
+<!-- Broadcast alert bar — Edit: html/broadcast-bar.html | js/broadcast.js | css/broadcast.css -->
+<div id="part-broadcast-bar"></div>
+
+<!-- Lead alert banner — Edit: html/lead-alert.html | js/firebase-bridge.js | css/modals.css -->
+<div id="part-lead-alert"></div>
+
+<!-- Login screen — Edit: html/login.html | js/login.js | css/login.css -->
+<div id="part-login"></div>
+
+
+<!-- ── MAIN APP (shown after login) ── -->
+<div id="main-app" style="display:none;">
+
+  <!-- Agent info sticky banner — Edit: html/agent-banner.html | js/agent-banner.js | css/modals.css -->
+  <div id="part-agent-banner"></div>
+
+  <!-- Nav tab bar — Edit: html/nav.html | js/nav.js -->
+  <div id="part-nav"></div>
+
+  <!-- ── SCROLLABLE CONTENT AREA ── -->
+  <div class="main-container mx-auto px-3 pb-20" style="max-width:680px;">
+
+    <!-- LEADERBOARD — Edit: html/views/leaderboard.html | js/leaderboard.js -->
+    <div id="leaderboard-view">
+      <div id="part-leaderboard"></div>
+    </div>
+
+    <!-- LOOKUP — Edit: html/views/lookup.html | js/lookup.js -->
+    <div id="lookup-view" style="display:none;">
+      <div id="part-lookup"></div>
+    </div>
+
+    <!-- PLAYBOOK — Edit: html/views/playbook.html | js/playbook.js -->
+    <div id="playbook-view" style="display:none;">
+      <div id="part-playbook"></div>
+    </div>
+
+    <!-- REBUTTALS — Edit: html/views/rebuttals.html | js/rebuttals.js -->
+    <div id="rebuttals-view" style="display:none;">
+      <div id="part-rebuttals"></div>
+    </div>
+
+    <!-- PRANK — Edit: html/views/prank.html | js/prank.js -->
+    <div id="prank-view" style="display:none;">
+      <div id="part-prank"></div>
+    </div>
+
+    <!-- MONTHLY — Edit: html/views/monthly.html | js/monthly.js -->
+    <div id="monthly-view" style="display:none;">
+      <div id="part-monthly"></div>
+    </div>
+
+    <!-- TRIVIA — Edit: html/views/trivia.html | js/trivia.js | css/trivia.css -->
+    <div id="trivia-view" style="display:none;">
+      <div id="part-trivia"></div>
+    </div>
+
+    <!-- ONLINE / NADIA ADMIN — Edit: html/views/online.html | js/online.js | css/online.css -->
+    <div id="online-view" style="display:none;">
+      <div id="part-online"></div>
+    </div>
+
+  </div><!-- /main-container -->
+</div><!-- /main-app -->
+
+
+<!-- ── MORE FLOATING LAYERS ── -->
+
+<!-- Top Performer popup + confetti canvas — Edit: html/top-performer-modal.html | js/leaderboard.js | css/modals.css -->
+<div id="part-top-performer"></div>
+
+<!-- Admin broadcast float button + panel — Edit: html/broadcast-panel.html | js/broadcast.js | css/broadcast.css -->
+<div id="part-broadcast-panel"></div>
+
+<!-- Broadcast admin login modal — Edit: html/bc-login-modal.html | js/broadcast.js | css/broadcast.css -->
+<div id="part-bc-login-modal"></div>
+
+<!-- Password gate modal (Nadia/admin views) — Edit: html/pw-modal.html | js/nav.js | css/globals.css -->
+<div id="part-pw-modal"></div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT — load order matters. firebase-config must be
+     first. loader.js is second and handles everything after.
+═══════════════════════════════════════════════════════════ -->
+
+<!-- STEP 1: Firebase init — sets up window.db used by all JS -->
+<!-- Edit: js/firebase-config.js -->
+<script src="js/firebase-config.js"></script>
+
+<!-- STEP 2: Loader — fetches html/ partials, then loads js/ modules in order -->
+<!-- Edit: js/loader.js (change HTML_PARTS or JS_MODULES arrays at the top) -->
+<script src="js/loader.js"></script>
+
+<!--
+  After loader.js runs it will load these JS files in order:
+    js/firebase-bridge.js   ← realtime listeners, session, attendance
+    js/login.js             ← login screen
+    js/nav.js               ← tab switching + password gate
+    js/agent-banner.js      ← sticky agent info bar
+    js/broadcast.js         ← broadcast bar + admin panel
+    js/leaderboard.js       ← leaderboard + top performer popup
+    js/lookup.js            ← business lookup
+    js/playbook.js          ← industry drill accordions
+    js/rebuttals.js         ← rebuttal cards
+    js/prank.js             ← prank view
+    js/monthly.js           ← monthly overview
+    js/online.js            ← Nadia who's online view
+    js/trivia.js            ← trivia engine (always last)
+-->
+
+</body>
+</html>
