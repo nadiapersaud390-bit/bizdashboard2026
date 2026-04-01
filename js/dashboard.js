@@ -120,18 +120,18 @@ async function updateDashboard() {
 
 function renderDaySubTabs() {
     const wrapper=document.getElementById('day-sub-tabs-wrapper'),container=document.getElementById('day-sub-tabs-container');
-    if(currentTab!=='daily'){wrapper.classList.add('hidden');return;}
-    if(!dayHistory.length){wrapper.classList.add('hidden');return;}
+    if(currentTab!=='daily'){wrapper.style.display='none';return;}
+    if(!dayHistory.length){wrapper.style.display='none';return;}
     let html='<button onclick="switchDayView(\'today\')" class="day-sub-tab is-today '+(currentDayView==='today'?'active':'')+'">Today</button>';
     dayHistory.forEach(d=>{html+='<button onclick="switchDayView('+d.day+')" class="day-sub-tab is-history '+(currentDayView===d.day?'active':'')+'">'+DAY_SHORT[d.day]+'<span class="history-dot"></span></button>';});
-    container.innerHTML=html;wrapper.classList.remove('hidden');
+    container.innerHTML=html;wrapper.style.display='flex';
 }
 
 function switchDayView(key){currentDayView=key;renderDaySubTabs();render();}
 
-function requestWeekly(){if(weeklyUnlocked){currentTab='weekly';updateTabUI();render();renderDaySubTabs();return;}document.getElementById('pw-modal').classList.remove('hidden');document.getElementById('pw-input').value='';document.getElementById('pw-error').innerText='';document.getElementById('pw-input').classList.remove('error');setTimeout(()=>document.getElementById('pw-input').focus(),100);}
-function checkPassword(){if(document.getElementById('pw-input').value===WEEKLY_PASSWORD){weeklyUnlocked=true;document.getElementById('pw-modal').classList.add('hidden');document.getElementById('tab-weekly').innerHTML='Weekly';currentTab='weekly';currentDayView='today';updateTabUI();render();renderDaySubTabs();}else{const inp=document.getElementById('pw-input');inp.classList.add('error');document.getElementById('pw-error').innerText='Incorrect access code. Try again.';inp.value='';setTimeout(()=>inp.classList.remove('error'),500);setTimeout(()=>inp.focus(),100);}}
-function cancelPassword(){document.getElementById('pw-modal').classList.add('hidden');}
+function requestWeekly(){if(weeklyUnlocked){currentTab='weekly';updateTabUI();render();renderDaySubTabs();return;}document.getElementById('pw-modal').style.display='flex';document.getElementById('pw-input').value='';document.getElementById('pw-error').innerText='';document.getElementById('pw-input').classList.remove('error');setTimeout(()=>document.getElementById('pw-input').focus(),100);}
+function checkPassword(){if(document.getElementById('pw-input').value===WEEKLY_PASSWORD){weeklyUnlocked=true;document.getElementById('pw-modal').style.display='none';document.getElementById('tab-weekly').innerHTML='Weekly';currentTab='weekly';currentDayView='today';updateTabUI();render();renderDaySubTabs();}else{const inp=document.getElementById('pw-input');inp.classList.add('error');document.getElementById('pw-error').innerText='Incorrect access code. Try again.';inp.value='';setTimeout(()=>inp.classList.remove('error'),500);setTimeout(()=>inp.focus(),100);}}
+function cancelPassword(){document.getElementById('pw-modal').style.display='none';}
 
 function switchTab(tab){
     if(tab==='weekly'){requestWeekly();return;}
@@ -221,17 +221,17 @@ function activateMonthTab(key) {
 
 function render(){
     const lView=document.getElementById('leaderboard-view'),pView=document.getElementById('playbook-view'),luView=document.getElementById('lookup-view'),prView=document.getElementById('prank-view'),rbView=document.getElementById('rebuttals-view'),trView=document.getElementById('trivia-view'),mView=document.getElementById('monthly-view'),onView=document.getElementById('online-view');
-    [lView,pView,luView,prView,rbView,trView,mView,onView].forEach(v=>{if(v)v.classList.add('hidden');});
+    [lView,pView,luView,prView,rbView,trView,mView,onView].forEach(v=>{if(v)v.style.display='none';});
     // Deactivate all month tabs when switching away
     if(!currentTab.startsWith('month-')) { document.querySelectorAll('#monthly-tabs-row button').forEach(b=>{b.style.opacity='0.5';b.style.background='rgba(255,255,255,0.03)';b.style.borderColor='rgba(255,255,255,0.1)';}); }
-    if(currentTab==='playbook'){pView.classList.remove('hidden');return;}
-    if(currentTab==='lookup'){luView.classList.remove('hidden');return;}
-    if(currentTab==='prank'){if(prView)prView.classList.remove('hidden');return;}
-    if(currentTab==='rebuttals'){if(rbView)rbView.classList.remove('hidden');return;}
-    if(currentTab==='trivia'){if(trView)trView.classList.remove('hidden');return;}
-    if(currentTab==='online'){if(onView)onView.classList.remove('hidden');return;}
+    if(currentTab==='playbook'){pView.style.display='';return;}
+    if(currentTab==='lookup'){luView.style.display='';return;}
+    if(currentTab==='prank'){if(prView)prView.style.display='';return;}
+    if(currentTab==='rebuttals'){if(rbView)rbView.style.display='';return;}
+    if(currentTab==='trivia'){if(trView)trView.style.display='';return;}
+    if(currentTab==='online'){if(onView)onView.style.display='';return;}
     if(currentTab.startsWith('month-')){
-      if(mView) mView.classList.remove('hidden');
+      if(mView) mView.style.display='';
       const key=currentTab.replace('month-','');
       const [yr,mo]=key.split('-');
       const mName=MONTH_NAMES[parseInt(mo)-1]+' '+yr;
@@ -241,9 +241,9 @@ function render(){
       activateMonthTab(key);
       return;
     }
-    lView.classList.remove('hidden');
+    lView.style.display='';
     const isWeekly=currentTab==='weekly',isHistory=currentTab==='daily'&&currentDayView!=='today',target=isWeekly?800:120,todayName=agents.length>0?(agents[0].todayName||'Today'):'Today',banner=document.getElementById('history-banner');
-    if(isHistory){const snap=dayHistory.find(d=>d.day===currentDayView);document.getElementById('history-banner-text').innerText='Viewing '+(snap?snap.dayName:DAY_FULL[currentDayView])+' — Final Results';banner.classList.remove('hidden');}else{banner.classList.add('hidden');}
+    if(isHistory){const snap=dayHistory.find(d=>d.day===currentDayView);document.getElementById('history-banner-text').innerText='Viewing '+(snap?snap.dayName:DAY_FULL[currentDayView])+' — Final Results';banner.style.display='';}else{banner.style.display='none';}
     document.getElementById('goal-label').innerText=isWeekly?'Weekly Team Goal':isHistory?DAY_FULL[currentDayView]+' Final':todayName+' Daily Goal';
     document.getElementById('target-display').innerText='Target: '+target;
     document.getElementById('day-indicator').innerText=isWeekly?'Weekly Sprint':isHistory?DAY_SHORT[currentDayView]+' — Completed':todayName+' Performance';
@@ -270,10 +270,10 @@ function detectPrank(query){const q=query.trim().toLowerCase();const reasons=[];
 function isPhoneNum(q){return /^[\d\s\-\(\)\+\.]+$/.test(q)&&q.replace(/\D/g,'').length>=7;}
 function buildQuery(q){if(isPhoneNum(q))return 'For the phone number '+q+', give me: the business name, the name of the owner, the address, and email if possible';return 'For the business "'+q+'", give me: the business name, the name of the owner, the address, and email if possible';}
 function runLookup(){const q=document.getElementById('lookup-input').value.trim();if(!q){document.getElementById('lookup-input').focus();return;}const knownBad=checkKnownBadNumber(q);if(knownBad){showKnownBadAlert(knownBad,q);const entry={query:q,prankScore:knownBad.type==='prank'?100:knownBad.type==='trucking'?90:70,prankVerdict:knownBad.type==='prank'?'definite_prank':'suspicious',prankReasons:['Found in known bad number database: '+knownBad.label],timestamp:new Date().toISOString()};lookupHistory.unshift(entry);if(lookupHistory.length>15)lookupHistory=lookupHistory.slice(0,15);try{localStorage.setItem('bizlookup_history',JSON.stringify(lookupHistory));}catch(e){}renderLookupHistory();return;}const prank=detectPrank(q);showPrankResult(prank);const entry={query:q,prankScore:prank.prankScore,prankVerdict:prank.prankVerdict,prankReasons:prank.prankReasons,timestamp:new Date().toISOString()};lookupHistory.unshift(entry);if(lookupHistory.length>15)lookupHistory=lookupHistory.slice(0,15);try{localStorage.setItem('bizlookup_history',JSON.stringify(lookupHistory));}catch(e){}renderLookupHistory();openSite('google');}
-function showKnownBadAlert(bad,q){const el=document.getElementById('lookup-prank-result');const iconMap={prank:'fas fa-ban',trucking:'fas fa-truck',notserious:'fas fa-exclamation-triangle'};const bgMap={prank:'linear-gradient(135deg,rgba(239,68,68,0.25),rgba(185,28,28,0.35))',trucking:'linear-gradient(135deg,rgba(249,115,22,0.2),rgba(194,65,12,0.3))',notserious:'linear-gradient(135deg,rgba(234,179,8,0.18),rgba(161,98,7,0.28))'};const c=bad.color,icon=iconMap[bad.type],bg=bgMap[bad.type];el.innerHTML='<div style="border-radius:18px;overflow:hidden;border:3px solid '+c+';box-shadow:0 0 40px '+c+'55;animation:fadeSlideIn 0.25s ease-out;"><div style="background:'+bg+';padding:20px 22px;position:relative;overflow:hidden;"><div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,'+c+'09 10px,'+c+'09 20px);"></div><div style="position:relative;display:flex;align-items:center;gap:16px;"><div style="width:56px;height:56px;border-radius:50%;background:'+c+'22;border:2px solid '+c+'55;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="'+icon+'" style="color:'+c+';font-size:1.3rem;"></i></div><div style="flex:1;"><div style="font-family:Orbitron,sans-serif;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.12em;color:'+c+';margin-bottom:4px;">'+bad.label+'</div><div style="font-size:12px;font-weight:700;color:#e2e8f0;line-height:1.5;">'+bad.msg+'</div><div style="margin-top:8px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#475569;">Number: <span style="color:'+c+';">'+escapeHtml(q)+'</span> — Found in database</div></div></div></div><div style="background:rgba(2,6,23,0.85);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#334155;">Still want to search anyway?</span><button onclick="openSite(\'google\')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 14px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;cursor:pointer;" onmouseover="this.style.color=\'#94a3b8\'" onmouseout="this.style.color=\'#64748b\'">Search Anyway <i class="fas fa-external-link-alt ml-1"></i></button></div></div>';el.classList.remove('hidden');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+function showKnownBadAlert(bad,q){const el=document.getElementById('lookup-prank-result');const iconMap={prank:'fas fa-ban',trucking:'fas fa-truck',notserious:'fas fa-exclamation-triangle'};const bgMap={prank:'linear-gradient(135deg,rgba(239,68,68,0.25),rgba(185,28,28,0.35))',trucking:'linear-gradient(135deg,rgba(249,115,22,0.2),rgba(194,65,12,0.3))',notserious:'linear-gradient(135deg,rgba(234,179,8,0.18),rgba(161,98,7,0.28))'};const c=bad.color,icon=iconMap[bad.type],bg=bgMap[bad.type];el.innerHTML='<div style="border-radius:18px;overflow:hidden;border:3px solid '+c+';box-shadow:0 0 40px '+c+'55;animation:fadeSlideIn 0.25s ease-out;"><div style="background:'+bg+';padding:20px 22px;position:relative;overflow:hidden;"><div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,'+c+'09 10px,'+c+'09 20px);"></div><div style="position:relative;display:flex;align-items:center;gap:16px;"><div style="width:56px;height:56px;border-radius:50%;background:'+c+'22;border:2px solid '+c+'55;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="'+icon+'" style="color:'+c+';font-size:1.3rem;"></i></div><div style="flex:1;"><div style="font-family:Orbitron,sans-serif;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.12em;color:'+c+';margin-bottom:4px;">'+bad.label+'</div><div style="font-size:12px;font-weight:700;color:#e2e8f0;line-height:1.5;">'+bad.msg+'</div><div style="margin-top:8px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#475569;">Number: <span style="color:'+c+';">'+escapeHtml(q)+'</span> — Found in database</div></div></div></div><div style="background:rgba(2,6,23,0.85);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#334155;">Still want to search anyway?</span><button onclick="openSite(\'google\')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 14px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;cursor:pointer;" onmouseover="this.style.color=\'#94a3b8\'" onmouseout="this.style.color=\'#64748b\'">Search Anyway <i class="fas fa-external-link-alt ml-1"></i></button></div></div>';el.style.display='';el.scrollIntoView({behavior:'smooth',block:'nearest'});}
 function openSite(site){const q=document.getElementById('lookup-input').value.trim();if(!q){document.getElementById('lookup-input').focus();return;}const isPhone=isPhoneNum(q),digits=q.replace(/\D/g,''),gq=buildQuery(q);const urls={google:'https://www.google.com/search?q='+encodeURIComponent(gq)+'&udm=50',bing:'https://www.bing.com/search?q='+encodeURIComponent(gq)+'&showconv=1',yellowpages:isPhone?'https://www.yellowpages.com/phone-lookup?phone='+digits:'https://www.yellowpages.com/search?search_terms='+encodeURIComponent(q)+'&geo_location_terms=United+States',whitepages:isPhone?'https://www.whitepages.com/phone/'+digits:'https://www.whitepages.com/business/'+encodeURIComponent(q),yelp:'https://www.yelp.com/search?find_desc='+encodeURIComponent(q)+'&find_loc=United+States','411':isPhone?'https://www.411.com/phone/'+digits:'https://www.411.com/business/search?q='+encodeURIComponent(q)};if(urls[site])window.open(urls[site],'_blank');}
-function showPrankResult(prank){const el=document.getElementById('lookup-prank-result');if(!prank||prank.prankScore<26){el.classList.add('hidden');el.innerHTML='';return;}const s=prank.prankScore,isD=s>=80,isP=s>=56,label=isD?'🚨 DEFINITE PRANK — END CALL &amp; MOVE ON':isP?'⚠️ LIKELY PRANK — PROCEED WITH CAUTION':'👀 SUSPICIOUS — VERIFY CAREFULLY',color=isD?'#ef4444':isP?'#f97316':'#eab308',bg=isD?'linear-gradient(135deg,rgba(239,68,68,0.22),rgba(185,28,28,0.32))':isP?'linear-gradient(135deg,rgba(249,115,22,0.18),rgba(194,65,12,0.28))':'linear-gradient(135deg,rgba(234,179,8,0.14),rgba(161,98,7,0.24))';const rHTML=(prank.prankReasons||[]).map(r=>'<div style="display:flex;align-items:center;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:8px 12px;"><i class="fas fa-flag" style="color:'+color+';font-size:10px;flex-shrink:0;"></i><span style="font-size:12px;color:#fca5a5;font-weight:700;">'+escapeHtml(r)+'</span></div>').join('');el.innerHTML='<div style="border-radius:18px;overflow:hidden;border:2px solid '+color+';box-shadow:0 0 30px '+color+'44;animation:fadeSlideIn 0.3s ease-out;"><div style="background:'+bg+';padding:18px 20px;border-bottom:1px solid '+color+'30;position:relative;overflow:hidden;"><div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,'+color+'08 10px,'+color+'08 20px);"></div><div style="position:relative;display:flex;align-items:center;gap:14px;"><div style="width:58px;height:58px;border-radius:50%;background:conic-gradient('+color+' '+s+'%,rgba(255,255,255,0.04) '+s+'%);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;"><div style="position:absolute;inset:6px;border-radius:50%;background:#020617;"></div><span style="position:relative;z-index:1;font-family:Orbitron,sans-serif;font-weight:900;font-size:0.9rem;color:'+color+';">'+s+'</span></div><div><div style="font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:'+color+';margin-bottom:3px;">'+label+'</div><div style="font-size:10px;color:#94a3b8;font-weight:700;">Prank Risk Score: <span style="color:'+color+';font-weight:900;">'+s+'/100</span></div></div></div></div>'+(rHTML?'<div style="background:rgba(2,6,23,0.75);padding:14px;display:flex;flex-direction:column;gap:6px;">'+rHTML+'</div>':'')+'</div>';el.classList.remove('hidden');}
-function onLookupInput(val){const q=val.trim(),digits=normalizePhone(q);if(digits.length===10){const bad=checkKnownBadNumber(q);if(bad){showKnownBadAlert(bad,q);return;}}if(!q){const pr=document.getElementById('lookup-prank-result');if(pr){pr.classList.add('hidden');pr.innerHTML='';}}}
+function showPrankResult(prank){const el=document.getElementById('lookup-prank-result');if(!prank||prank.prankScore<26){el.style.display='none';el.innerHTML='';return;}const s=prank.prankScore,isD=s>=80,isP=s>=56,label=isD?'🚨 DEFINITE PRANK — END CALL &amp; MOVE ON':isP?'⚠️ LIKELY PRANK — PROCEED WITH CAUTION':'👀 SUSPICIOUS — VERIFY CAREFULLY',color=isD?'#ef4444':isP?'#f97316':'#eab308',bg=isD?'linear-gradient(135deg,rgba(239,68,68,0.22),rgba(185,28,28,0.32))':isP?'linear-gradient(135deg,rgba(249,115,22,0.18),rgba(194,65,12,0.28))':'linear-gradient(135deg,rgba(234,179,8,0.14),rgba(161,98,7,0.24))';const rHTML=(prank.prankReasons||[]).map(r=>'<div style="display:flex;align-items:center;gap:8px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:8px 12px;"><i class="fas fa-flag" style="color:'+color+';font-size:10px;flex-shrink:0;"></i><span style="font-size:12px;color:#fca5a5;font-weight:700;">'+escapeHtml(r)+'</span></div>').join('');el.innerHTML='<div style="border-radius:18px;overflow:hidden;border:2px solid '+color+';box-shadow:0 0 30px '+color+'44;animation:fadeSlideIn 0.3s ease-out;"><div style="background:'+bg+';padding:18px 20px;border-bottom:1px solid '+color+'30;position:relative;overflow:hidden;"><div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,'+color+'08 10px,'+color+'08 20px);"></div><div style="position:relative;display:flex;align-items:center;gap:14px;"><div style="width:58px;height:58px;border-radius:50%;background:conic-gradient('+color+' '+s+'%,rgba(255,255,255,0.04) '+s+'%);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;"><div style="position:absolute;inset:6px;border-radius:50%;background:#020617;"></div><span style="position:relative;z-index:1;font-family:Orbitron,sans-serif;font-weight:900;font-size:0.9rem;color:'+color+';">'+s+'</span></div><div><div style="font-family:Orbitron,sans-serif;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:'+color+';margin-bottom:3px;">'+label+'</div><div style="font-size:10px;color:#94a3b8;font-weight:700;">Prank Risk Score: <span style="color:'+color+';font-weight:900;">'+s+'/100</span></div></div></div></div>'+(rHTML?'<div style="background:rgba(2,6,23,0.75);padding:14px;display:flex;flex-direction:column;gap:6px;">'+rHTML+'</div>':'')+'</div>';el.style.display='';}
+function onLookupInput(val){const q=val.trim(),digits=normalizePhone(q);if(digits.length===10){const bad=checkKnownBadNumber(q);if(bad){showKnownBadAlert(bad,q);return;}}if(!q){const pr=document.getElementById('lookup-prank-result');if(pr){pr.style.display='none';pr.innerHTML='';}}}
 async function logPrankCall(){
   const q=document.getElementById('lookup-input').value.trim();
   const statusEl=document.getElementById('prank-log-status');
@@ -315,8 +315,8 @@ async function logPrankCall(){
   btn.innerHTML='<i class="fas fa-ban"></i>&nbsp;Log Prank Call &#8594; Sheet';
 }
 
-function clearLookup(){document.getElementById('lookup-input').value='';const pr=document.getElementById('lookup-prank-result');if(pr){pr.classList.add('hidden');pr.innerHTML='';}document.getElementById('lookup-input').focus();}
-function renderLookupHistory(){const sec=document.getElementById('lookup-history-section'),con=document.getElementById('lookup-history');if(!lookupHistory.length){sec.classList.add('hidden');return;}sec.classList.remove('hidden');con.innerHTML=lookupHistory.map((h,i)=>{const ago=timeAgo(new Date(h.timestamp)),s=h.prankScore||0;const badge=s>=80?'<span style="font-size:9px;font-weight:900;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:20px;padding:2px 7px;margin-left:6px;">🚨 PRANK</span>':s>=56?'<span style="font-size:9px;font-weight:900;background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:2px 7px;margin-left:6px;">⚠️ SUSPECT</span>':s>=26?'<span style="font-size:9px;font-weight:900;background:rgba(234,179,8,0.15);color:#eab308;border:1px solid rgba(234,179,8,0.3);border-radius:20px;padding:2px 7px;margin-left:6px;">👀 CHECK</span>':'';return'<div class="search-history-item" onclick="reloadHistory('+i+')"><div><div class="font-black text-sm text-white">'+escapeHtml(h.query)+badge+'</div><div class="text-[10px] text-slate-600 font-bold mt-0.5 uppercase tracking-wide">'+ago+'</div></div><i class="fas fa-chevron-right text-slate-700 text-xs"></i></div>';}).join('');}
+function clearLookup(){document.getElementById('lookup-input').value='';const pr=document.getElementById('lookup-prank-result');if(pr){pr.style.display='none';pr.innerHTML='';}document.getElementById('lookup-input').focus();}
+function renderLookupHistory(){const sec=document.getElementById('lookup-history-section'),con=document.getElementById('lookup-history');if(!lookupHistory.length){sec.style.display='none';return;}sec.style.display='';con.innerHTML=lookupHistory.map((h,i)=>{const ago=timeAgo(new Date(h.timestamp)),s=h.prankScore||0;const badge=s>=80?'<span style="font-size:9px;font-weight:900;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:20px;padding:2px 7px;margin-left:6px;">🚨 PRANK</span>':s>=56?'<span style="font-size:9px;font-weight:900;background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:2px 7px;margin-left:6px;">⚠️ SUSPECT</span>':s>=26?'<span style="font-size:9px;font-weight:900;background:rgba(234,179,8,0.15);color:#eab308;border:1px solid rgba(234,179,8,0.3);border-radius:20px;padding:2px 7px;margin-left:6px;">👀 CHECK</span>':'';return'<div class="search-history-item" onclick="reloadHistory('+i+')"><div><div class="font-black text-sm text-white">'+escapeHtml(h.query)+badge+'</div><div class="text-[10px] text-slate-600 font-bold mt-0.5 uppercase tracking-wide">'+ago+'</div></div><i class="fas fa-chevron-right text-slate-700 text-xs"></i></div>';}).join('');}
 function reloadHistory(i){const h=lookupHistory[i];if(!h)return;document.getElementById('lookup-input').value=h.query;showPrankResult({prankScore:h.prankScore||0,prankReasons:h.prankReasons||[],prankVerdict:h.prankVerdict||'clean'});}
 function clearHistory(){lookupHistory=[];try{localStorage.setItem('bizlookup_history','[]');}catch(e){}renderLookupHistory();}
 function timeAgo(date){const m=Math.floor((Date.now()-date.getTime())/60000);if(m<1)return'Just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
@@ -475,10 +475,10 @@ function getNextRoundTime(){const h=new Date().getHours();let tH;if(h<11)tH=11;e
 
 function updateNextRoundCountdown(){
   const next=getNextRoundTime(),el=document.getElementById('trivia-next-countdown'),bar=document.getElementById('trivia-countdown-bar');
-  if(!next||!el){if(bar)bar.classList.add('hidden');return;}
+  if(!next||!el){if(bar)bar.style.display='none';return;}
   const diff=next-Date.now();
-  if(diff<=0){if(bar)bar.classList.add('hidden');return;}
-  if(bar)bar.classList.remove('hidden');
+  if(diff<=0){if(bar)bar.style.display='none';return;}
+  if(bar)bar.style.display='';
   const hrs=Math.floor(diff/3600000),mins=Math.floor((diff%3600000)/60000),secs=Math.floor((diff%60000)/1000);
   el.textContent=hrs>0?hrs+'h '+String(mins).padStart(2,'0')+'m':String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
 }
@@ -507,10 +507,10 @@ async function startTrivia(anon=false){
   triviaState.playerName=anon?'Anonymous':(ni?ni.value.trim()||'Anonymous':'Anonymous');
   triviaState.roundKey=getRoundKey();
   triviaState.streak=0;
-  document.getElementById('trivia-name-screen').classList.add('hidden');
-  document.getElementById('trivia-loading-screen').classList.remove('hidden');
-  document.getElementById('trivia-result-screen').classList.add('hidden');
-  document.getElementById('trivia-question-screen').classList.add('hidden');
+  document.getElementById('trivia-name-screen').style.display='none';
+  document.getElementById('trivia-loading-screen').style.display='';
+  document.getElementById('trivia-result-screen').style.display='none';
+  document.getElementById('trivia-question-screen').style.display='none';
   // loading tips ticker
   let tipIdx=0;
   const tipEl=document.getElementById('trivia-loading-tips');
@@ -528,14 +528,14 @@ async function startTrivia(anon=false){
     });
     triviaState.current=0;triviaState.score=0;triviaState.answers=[];
     clearInterval(triviaState.loadingTipInterval);
-    document.getElementById('trivia-loading-screen').classList.add('hidden');
-    document.getElementById('trivia-question-screen').classList.remove('hidden');
-    document.getElementById('trivia-explanation').classList.add('hidden');
+    document.getElementById('trivia-loading-screen').style.display='none';
+    document.getElementById('trivia-question-screen').style.display='';
+    document.getElementById('trivia-explanation').style.display='none';
     showTriviaQuestion();
   }catch(e){
     clearInterval(triviaState.loadingTipInterval);
-    document.getElementById('trivia-loading-screen').classList.add('hidden');
-    document.getElementById('trivia-name-screen').classList.remove('hidden');
+    document.getElementById('trivia-loading-screen').style.display='none';
+    document.getElementById('trivia-name-screen').style.display='';
     console.error('Trivia error:',e);
     alert('Could not load questions — please try again!');
   }
@@ -562,7 +562,7 @@ function showTriviaQuestion(){
     '<span style="background:'+bg+';border:1px solid '+tc+'44;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:900;text-transform:uppercase;color:'+tc+';letter-spacing:0.1em;">'+escapeHtml(q.category)+'</span>'+
     '<span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:900;text-transform:uppercase;color:#475569;letter-spacing:0.08em;">'+typeLabel+'</span>';
   document.getElementById('trivia-question-text').textContent=q.question;
-  document.getElementById('trivia-explanation').classList.add('hidden');
+  document.getElementById('trivia-explanation').style.display='none';
   // options
   const optEl=document.getElementById('trivia-options');
   if(q.type==='truefalse'){
@@ -623,12 +623,12 @@ function answerTrivia(chosen){
   });
   if(q.explanation){
     document.getElementById('trivia-explanation-text').textContent=q.explanation;
-    document.getElementById('trivia-explanation').classList.remove('hidden');
+    document.getElementById('trivia-explanation').style.display='';
   }
   if(isRight)spawnConfetti();
   setTimeout(()=>{
     triviaState.current++;
-    document.getElementById('trivia-explanation').classList.add('hidden');
+    document.getElementById('trivia-explanation').style.display='none';
     if(triviaState.current>=triviaState.questions.length)finishTrivia();
     else showTriviaQuestion();
   },isRight?900:1800);
@@ -649,8 +649,8 @@ function spawnConfetti(){
 
 function finishTrivia(){
   const score=triviaState.score,total=triviaState.questions.length,pct=Math.round(score/total*100);
-  document.getElementById('trivia-question-screen').classList.add('hidden');
-  document.getElementById('trivia-result-screen').classList.remove('hidden');
+  document.getElementById('trivia-question-screen').style.display='none';
+  document.getElementById('trivia-result-screen').style.display='';
   document.getElementById('trivia-progress').style.width='100%';
   const emoji=pct===100?'🏆':pct>=80?'🔥':pct>=60?'💪':pct>=40?'📚':'😅';
   const msg=pct===100?'Perfect score! You know this cold!':pct>=80?'Outstanding — nearly flawless!':pct>=60?'Solid round. Keep sharpening!':pct>=40?'Good effort — review the playbook.':'Study those rebuttals & try again!';
@@ -736,9 +736,9 @@ function renderTriviaLeaderboard(){
 
 function resetTrivia(){
   clearInterval(triviaState.timer);
-  document.getElementById('trivia-result-screen').classList.add('hidden');
-  document.getElementById('trivia-question-screen').classList.add('hidden');
-  document.getElementById('trivia-name-screen').classList.remove('hidden');
+  document.getElementById('trivia-result-screen').style.display='none';
+  document.getElementById('trivia-question-screen').style.display='none';
+  document.getElementById('trivia-name-screen').style.display='';
   document.getElementById('trivia-progress').style.width='0%';
 }
 
@@ -1289,7 +1289,7 @@ function checkBcPassword(){
   const errEl = document.getElementById('bc-pw-error');
   if(val === BC_ADMIN_PASSWORD){
     bcAdminUnlocked = true;
-    document.getElementById('bc-login-modal').classList.add('hidden');
+    document.getElementById('bc-login-modal').style.display='none';
     document.getElementById('bc-pw-input').value = '';
     errEl.textContent = '';
     const floatBtn = document.getElementById('bc-float-btn');
@@ -1484,13 +1484,13 @@ function showTopPerformerPopup(manualTrigger = false, daySnap = null) {
     }).join('');
   }
 
-  document.getElementById('top-performer-modal').classList.remove('hidden');
+  document.getElementById('top-performer-modal').style.display='flex';
   startTpConfetti();
   startTabBlink('👑 Top Performers!');
 }
 
 function closeTopPerformer() {
-  document.getElementById('top-performer-modal').classList.add('hidden');
+  document.getElementById('top-performer-modal').style.display='none';
   stopTpConfetti();
   stopTabBlink();
 }

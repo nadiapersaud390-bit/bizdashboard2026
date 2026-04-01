@@ -305,7 +305,7 @@ function enterDashboard() {
   if (cursor) cursor.style.display = 'none';
   if (cursorDot) cursorDot.style.display = 'none';
   setTimeout(() => {
-    screen.classList.add('hidden');
+    screen.style.display='none';
     document.body.style.cursor = '';
     renderUserBadge();
     if (currentUser && currentUser.role === 'agent') {
@@ -533,7 +533,7 @@ function logoutUser() {
   const screen = document.getElementById('login-screen');
   screen.style.opacity = '0';
   screen.style.transform = 'scale(0.96)';
-  screen.classList.remove('hidden');
+  screen.style.display='';
   requestAnimationFrame(() => {
     screen.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
     screen.style.opacity = '1';
@@ -836,7 +836,7 @@ scheduleMidnightLogout();
 
   // Skip login screen and go straight to dashboard
   const screen = document.getElementById('login-screen');
-  if (screen) screen.classList.add('hidden');
+  if (screen) screen.style.display='none';
   document.body.style.cursor = '';
   if (cursor) cursor.style.display = 'none';
   if (cursorDot) cursorDot.style.display = 'none';
